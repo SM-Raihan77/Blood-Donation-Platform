@@ -1,0 +1,90 @@
+import { auth } from "@/lib/auth";
+import { Bars } from "@gravity-ui/icons";
+import { Button, Drawer } from "@heroui/react";
+import { ChartArea, User2 } from "lucide-react";
+import { headers } from "next/headers";
+import Link from "next/link";
+import { BiMoney } from "react-icons/bi";
+import { TbAsset } from "react-icons/tb";
+
+export default async function DashboardSidebar() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  const user = session?.user;
+  const role = user?.role || "donor";
+  console.log("Logged in user:", user);
+
+  const dashboardItems = {
+    donor: [
+      { icon: ChartArea, label: "Overview", link: "/dashboard/donor" },
+      { icon: TbAsset, label: "My Donation Requests", link: "/dashboard/donor/requests" },
+      { icon: BiMoney, label: "Create Donation Request", link: "/dashboard/donor/create-donation-request" },
+      { icon: BiMoney, label: "My Profile", link: "/dashboard/donor/profile" },
+    ],
+    volunteer: [
+      { icon: ChartArea, label: "Overview", link: "/dashboard/volunteer" },
+      { icon: TbAsset, label: "My Activities", link: "/dashboard/volunteer/activities" },
+      { icon: BiMoney, label: "Transaction", link: "/dashboard/volunteer/transaction" },
+    ],
+    admin: [
+      { icon: ChartArea, label: "Overview", link: "/dashboard/admin" },
+      { icon: User2, label: "All Users", link: "/dashboard/admin/all-users" },
+      { icon: TbAsset, label: "All Donation Requests", link: "/dashboard/admin/all-requests" },
+      { icon: BiMoney, label: "Transaction", link: "/dashboard/admin/transaction" },
+    ],
+  };
+
+  // জাভাস্ক্রিপ্টের জন্য টাইপ কাস্টিং ছাড়া সাধারণ কোড
+  const navItems = dashboardItems[role] || dashboardItems.donor;
+
+  return (
+    <Drawer>
+      <Button className="hidden" variant="secondary">
+        <Bars />
+        Menu
+      </Button>
+
+      {/* ডেস্কটপ সাইডবার */}
+      <nav className="flex flex-col gap-1 w-[200px] border-r border-default-200 min-h-screen p-2">
+        {navItems.map((item) => (
+          <Link 
+            key={item.link} 
+            href={item.link}
+            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-foreground transition-colors hover:bg-default-100"
+          >
+            <item.icon className="size-5 text-muted-foreground" />
+            <span>{item.label}</span>
+          </Link>
+        ))}
+      </nav>
+
+      {/* মোবাইল ড্রয়ার */}
+      <Drawer.Backdrop>
+        <Drawer.Content placement="left">
+          <Drawer.Dialog>
+            <Drawer.CloseTrigger />
+            <Drawer.Header>
+              <Drawer.Heading>Navigation</Drawer.Heading>
+            </Drawer.Header>
+            <Drawer.Body>
+              <nav className="flex flex-col gap-1">
+                {navItems.map((item) => (
+                  <Link 
+                    key={item.link} 
+                    href={item.link}
+                    className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-foreground transition-colors hover:bg-default-100"
+                  >
+                    <item.icon className="size-5 text-muted-foreground" />
+                    <span>{item.label}</span>
+                  </Link>
+                ))}
+              </nav>
+            </Drawer.Body>
+          </Drawer.Dialog>
+        </Drawer.Content>
+      </Drawer.Backdrop>
+    </Drawer>
+  );
+}
