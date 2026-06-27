@@ -13,26 +13,29 @@ export default async function DashboardSidebar() {
   });
 
   const user = session?.user;
-  const role = user?.role || "donor";
+  const role = user?.role;
   console.log("Logged in user:", user);
 
   const dashboardItems = {
     donor: [
       { icon: ChartArea, label: "Overview", link: "/dashboard/donor" },
-      { icon: TbAsset, label: "My Donation Requests", link: "/dashboard/donor/requests" },
+      { icon: TbAsset, label: "My Donation Requests", link: "/dashboard/donor/my-donation-requests" },
       { icon: BiMoney, label: "Create Donation Request", link: "/dashboard/donor/create-donation-request" },
       { icon: BiMoney, label: "My Profile", link: "/dashboard/donor/profile" },
     ],
     volunteer: [
       { icon: ChartArea, label: "Overview", link: "/dashboard/volunteer" },
-      { icon: TbAsset, label: "My Activities", link: "/dashboard/volunteer/activities" },
+      { icon: TbAsset, label: "All Donation Requests", link: "/dashboard/volunteer/all-blood-donation-request" },
       { icon: BiMoney, label: "Transaction", link: "/dashboard/volunteer/transaction" },
+      { icon: BiMoney, label: "My Profile", link: "/dashboard/volunteer/profile" },
     ],
     admin: [
       { icon: ChartArea, label: "Overview", link: "/dashboard/admin" },
       { icon: User2, label: "All Users", link: "/dashboard/admin/all-users" },
-      { icon: TbAsset, label: "All Donation Requests", link: "/dashboard/admin/all-requests" },
+     
       { icon: BiMoney, label: "Transaction", link: "/dashboard/admin/transaction" },
+      { icon: TbAsset, label: "All Blood Donation Requests", link: "/dashboard/admin/all-blood-donation-request" },
+      { icon: BiMoney, label: "My Profile", link: "/dashboard/admin/profile" },
     ],
   };
 

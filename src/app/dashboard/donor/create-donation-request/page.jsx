@@ -1,15 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import districtsData from '@/data/districts.json';
-import upazilasData from '@/data/upazilas.json';
-
-// গুরুত্বপূর্ণ সংশোধন: সরাসরি অবজেক্টটি ইম্পোর্ট করুন (পাথ আপনার প্রজেক্ট অনুযায়ী মিলিয়ে নিন)
-import { authClient } from "@/lib/auth-client"; 
+import React, { useState, useEffect } from "react";
+import districtsData from "@/data/districts.json";
+import upazilasData from "@/data/upazilas.json";
+import { authClient } from "@/lib/auth-client";
 
 const findMainData = (jsonFile) => {
   if (!jsonFile || !Array.isArray(jsonFile)) return [];
-  const targetObj = jsonFile.find(item => item && Array.isArray(item.data));
+  const targetObj = jsonFile.find((item) => item && Array.isArray(item.data));
   return targetObj ? targetObj.data : [];
 };
 
@@ -19,16 +17,17 @@ const allUpazilas = findMainData(upazilasData);
 const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
 export default function CreateDonationRequest() {
-  // ১. সেশন থেকে লগইন করা ইউজারের ডাটা আনা
   const { data: session } = authClient.useSession();
   const user = session?.user;
 
-  // সেশন লোড না হওয়া পর্যন্ত ডেমো বা ফলব্যাক ইউজার ডাটা
-  const donorUser = user?.name ? user : { name: "Donor User", email: "donor@example.com" };
+  const donorUser = user?.name
+    ? user
+    : { name: "Donor User", email: "donor@example.com" };
 
-  // ২. স্টেটস 
   const [selectedDistrictId, setSelectedDistrictId] = useState("");
+  const [selectedUpazilaId, setSelectedUpazilaId] = useState("");
   const [filteredUpazilas, setFilteredUpazilas] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     recipientName: "",
@@ -37,53 +36,30 @@ export default function CreateDonationRequest() {
     bloodGroup: "",
     donationDate: "",
     donationTime: "",
-    requestMessage: ""
+    requestMessage: "",
   });
 
-  // ৩. ডিস্ট্রিক্ট চেঞ্জ হলে উপজেলা ফিল্টার করার এফেক্ট
   useEffect(() => {
     if (selectedDistrictId) {
       const filtered = allUpazilas.filter(
-        (upazila) => String(upazila.district_id) === String(selectedDistrictId)
+        (upazila) =>
+          String(upazila.district_id) === String(selectedDistrictId)
       );
       setFilteredUpazilas(filtered);
     } else {
       setFilteredUpazilas([]);
     }
+
+    // district change হলে upazila reset
+    setSelectedUpazilaId("");
   }, [selectedDistrictId]);
 
-  // ৪. সাধারণ ইনপুট চেঞ্জ হ্যান্ডলার
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ৫. ফর্ম সাবমিট হ্যান্ডলার
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const actualDistrictName = allDistricts.find(d => String(d.id) === String(selectedDistrictId))?.name || "";
-    const actualUpazilaName = filteredUpazilas.find(u => String(u.id) === String(e.target.upazila.value))?.name || "";
-
-    const requestPayload = {
-      requesterName: donorUser.name,
-      requesterEmail: donorUser.email,
-      recipientName: formData.recipientName,
-      district: actualDistrictName, 
-      upazila: actualUpazilaName,   
-      hospitalName: formData.hospitalName,
-      fullAddress: formData.fullAddress,
-      bloodGroup: formData.bloodGroup,
-      donationDate: formData.donationDate,
-      donationTime: formData.donationTime,
-      requestMessage: formData.requestMessage,
-      status: "pending" 
-    };
-
-    console.log("Submitting Blood Donation Request Payload:", requestPayload);
-    alert("Donation Request Created Successfully (Status: Pending)!");
-    
-    // ফর্ম এবং লোকেশন স্টেট রিসেট
+  const resetForm = () => {
     setFormData({
       recipientName: "",
       hospitalName: "",
@@ -91,43 +67,107 @@ export default function CreateDonationRequest() {
       bloodGroup: "",
       donationDate: "",
       donationTime: "",
-      requestMessage: ""
+      requestMessage: "",
     });
     setSelectedDistrictId("");
-    e.target.reset();
+    setSelectedUpazilaId("");
+    setFilteredUpazilas([]);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const actualDistrictName =
+      allDistricts.find((d) => String(d.id) === String(selectedDistrictId))
+        ?.name || "";
+
+    const actualUpazilaName =
+      filteredUpazilas.find((u) => String(u.id) === String(selectedUpazilaId))
+        ?.name || "";
+
+    const requestPayload = {
+      requesterName: donorUser.name,
+      requesterEmail: donorUser.email,
+      recipientName: formData.recipientName,
+      district: actualDistrictName,
+      upazila: actualUpazilaName,
+      hospitalName: formData.hospitalName,
+      fullAddress: formData.fullAddress,
+      bloodGroup: formData.bloodGroup,
+      donationDate: formData.donationDate,
+      donationTime: formData.donationTime,
+      requestMessage: formData.requestMessage,
+      status: "pending",
+    };
+
+    console.log("Payload যাচ্ছে:", requestPayload);
+
+    try {
+      setLoading(true);
+
+      const res = await fetch("http://localhost:5000/api/donation-requests", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestPayload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.message || "Failed to create donation request");
+      }
+
+      alert("Donation Request Created Successfully!");
+      resetForm();
+    } catch (error) {
+      console.error("Create donation request error:", error);
+      alert(error.message || "Something went wrong!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="p-6 max-w-3xl mx-auto min-h-screen bg-gray-50 text-gray-800">
-      
-      {/* হেডার সেকশন */}
+      {/* Header */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-red-600 flex items-center gap-2">
           Create Donation Request 🆕
         </h1>
-        <p className="text-gray-600 mt-1">Fill up the form below to request for blood.</p>
+        <p className="text-gray-600 mt-1">
+          Fill up the form below to request for blood.
+        </p>
       </div>
 
-      {/* ফর্ম */}
-      <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-xl p-6 border border-gray-100 space-y-5">
-        
-        {/* রিকোয়েস্টারের নাম ও ইমেইল (Read Only) */}
+      {/* Form */}
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white shadow-md rounded-xl p-6 border border-gray-100 space-y-5"
+      >
+        {/* requester info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-600 mb-1">Requester Name</label>
-            <input 
-              type="text" 
-              value={donorUser.name} 
-              readOnly 
+            <label className="block text-sm font-semibold text-gray-600 mb-1">
+              Requester Name
+            </label>
+            <input
+              type="text"
+              value={donorUser.name}
+              readOnly
               className="w-full bg-gray-100 border border-gray-200 rounded-lg p-2.5 text-gray-500 cursor-not-allowed focus:outline-none"
             />
           </div>
+
           <div>
-            <label className="block text-sm font-semibold text-gray-600 mb-1">Requester Email</label>
-            <input 
-              type="email" 
-              value={donorUser.email} 
-              readOnly 
+            <label className="block text-sm font-semibold text-gray-600 mb-1">
+              Requester Email
+            </label>
+            <input
+              type="email"
+              value={donorUser.email}
+              readOnly
               className="w-full bg-gray-100 border border-gray-200 rounded-lg p-2.5 text-gray-500 cursor-not-allowed focus:outline-none"
             />
           </div>
@@ -135,11 +175,13 @@ export default function CreateDonationRequest() {
 
         <hr className="border-gray-100" />
 
-        {/* রেসিপিয়েন্ট নাম */}
+        {/* recipient name */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Recipient Name *</label>
-          <input 
-            type="text" 
+          <label className="block text-sm font-semibold text-gray-700 mb-1">
+            Recipient Name *
+          </label>
+          <input
+            type="text"
             name="recipientName"
             value={formData.recipientName}
             onChange={handleInputChange}
@@ -149,11 +191,13 @@ export default function CreateDonationRequest() {
           />
         </div>
 
-        {/* ডিস্ট্রিক্ট ও উপজেলা */}
+        {/* district + upazila */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Recipient District *</label>
-            <select 
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Recipient District *
+            </label>
+            <select
               name="district"
               value={selectedDistrictId}
               onChange={(e) => setSelectedDistrictId(e.target.value)}
@@ -162,32 +206,42 @@ export default function CreateDonationRequest() {
             >
               <option value="">Select District</option>
               {allDistricts.map((dist) => (
-                <option key={dist.id} value={dist.id}>{dist.name}</option>
+                <option key={dist.id} value={dist.id}>
+                  {dist.name}
+                </option>
               ))}
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Recipient Upazila *</label>
-            <select 
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Recipient Upazila *
+            </label>
+            <select
               name="upazila"
+              value={selectedUpazilaId}
+              onChange={(e) => setSelectedUpazilaId(e.target.value)}
               required
               disabled={!selectedDistrictId}
               className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-red-200 focus:border-red-500 outline-none bg-white transition disabled:bg-gray-100 disabled:cursor-not-allowed"
             >
               <option value="">Select Upazila</option>
               {filteredUpazilas.map((upz) => (
-                <option key={upz.id} value={upz.id}>{upz.name}</option>
+                <option key={upz.id} value={upz.id}>
+                  {upz.name}
+                </option>
               ))}
             </select>
           </div>
         </div>
 
-        {/* হাসপাতালের নাম */}
+        {/* hospital */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Hospital Name *</label>
-          <input 
-            type="text" 
+          <label className="block text-sm font-semibold text-gray-700 mb-1">
+            Hospital Name *
+          </label>
+          <input
+            type="text"
             name="hospitalName"
             value={formData.hospitalName}
             onChange={handleInputChange}
@@ -197,11 +251,13 @@ export default function CreateDonationRequest() {
           />
         </div>
 
-        {/* ফুল অ্যাড্রেস */}
+        {/* address */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Full Address Line *</label>
-          <input 
-            type="text" 
+          <label className="block text-sm font-semibold text-gray-700 mb-1">
+            Full Address Line *
+          </label>
+          <input
+            type="text"
             name="fullAddress"
             value={formData.fullAddress}
             onChange={handleInputChange}
@@ -211,11 +267,13 @@ export default function CreateDonationRequest() {
           />
         </div>
 
-        {/* ব্লাড গ্রুপ, ডেট ও টাইম */}
+        {/* blood group + date + time */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Blood Group *</label>
-            <select 
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Blood Group *
+            </label>
+            <select
               name="bloodGroup"
               value={formData.bloodGroup}
               onChange={handleInputChange}
@@ -224,15 +282,19 @@ export default function CreateDonationRequest() {
             >
               <option value="">Select Group</option>
               {bloodGroups.map((group) => (
-                <option key={group} value={group}>{group}</option>
+                <option key={group} value={group}>
+                  {group}
+                </option>
               ))}
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Donation Date *</label>
-            <input 
-              type="date" 
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Donation Date *
+            </label>
+            <input
+              type="date"
               name="donationDate"
               value={formData.donationDate}
               onChange={handleInputChange}
@@ -242,9 +304,11 @@ export default function CreateDonationRequest() {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Donation Time *</label>
-            <input 
-              type="time" 
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Donation Time *
+            </label>
+            <input
+              type="time"
               name="donationTime"
               value={formData.donationTime}
               onChange={handleInputChange}
@@ -254,10 +318,12 @@ export default function CreateDonationRequest() {
           </div>
         </div>
 
-        {/* রিকোয়েস্ট মেসেজ */}
+        {/* message */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Request Message (Details) *</label>
-          <textarea 
+          <label className="block text-sm font-semibold text-gray-700 mb-1">
+            Request Message (Details) *
+          </label>
+          <textarea
             name="requestMessage"
             value={formData.requestMessage}
             onChange={handleInputChange}
@@ -265,20 +331,21 @@ export default function CreateDonationRequest() {
             rows="4"
             placeholder="Explain in detail why you need blood..."
             className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-red-200 focus:border-red-500 outline-none transition resize-none"
-          ></textarea>
+          />
         </div>
 
-        {/* সাবমিট বাটন */}
+        {/* submit */}
         <div className="pt-2">
-          <button 
+          <button
             type="submit"
-            className="w-full bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-700 transition shadow-md active:scale-[0.99]"
+            disabled={loading}
+            className="w-full bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-700 transition shadow-md active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Create Donation Request
+            {loading ? "Submitting..." : "Create Donation Request"}
           </button>
         </div>
-
       </form>
     </div>
   );
 }
+

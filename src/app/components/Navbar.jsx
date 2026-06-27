@@ -328,19 +328,17 @@ const Navbar = () => {
   const { data: session } = authClient.useSession();
   const user = session?.user;
 
-  const pathname = usePathname()
-  if(pathname.includes('dashboard')){
+  const pathname = usePathname();
+  if (pathname.includes('dashboard')) {
     return null;
   }
-
 
   const handleSignOut = async () => {
     await authClient.signOut();
   };
+
   return (
     <div>
-      
-
       <nav className="sticky top-0 z-40 w-full border-b border-separator bg-background/70 backdrop-blur-lg">
         <header className="mx-auto flex h-16 max-w-7xl items-center justify-between px-2">
           <div className="flex items-center gap-4">
@@ -387,6 +385,8 @@ const Navbar = () => {
               </div>
             </Link>
           </div>
+
+          {/* Desktop Navigation Links */}
           <ul className="hidden items-center gap-4 md:flex">
             <li>
               <Link
@@ -398,13 +398,20 @@ const Navbar = () => {
               </Link>
             </li>
             <li>
-              <Link href="/pricing">Pricing</Link>
+              <Link href="/search">Search</Link>
             </li>
+            {/* ইউজার লগইন থাকলে ডেস্কটপে এই Donation লিঙ্কটি দেখাবে */}
+            {user && (
+              <li>
+                <Link href="/donation">Donation</Link>
+              </li>
+            )}
           </ul>
-         {!user && (
+
+          {!user && (
             <div className="hidden items-center gap-4 md:flex">
-              <Link href="/signin">Login</Link>
-              <Link href="/signup">
+              <Link href="/login">Login</Link>
+              <Link href="/register">
                 <Button>Sign Up</Button>
               </Link>
             </div>
@@ -417,10 +424,10 @@ const Navbar = () => {
                   <Avatar size="sm" aria-label="Menu">
                     <Avatar.Image
                       referrerPolicy="no-referrer"
-                      alt="John Doe"
+                      alt="User Avatar"
                       src={user?.image}
                     />
-                    <Avatar.Fallback>{user.name.charAt(0)}</Avatar.Fallback>
+                    <Avatar.Fallback>{user.name?.charAt(0)}</Avatar.Fallback>
                   </Avatar>
                 </Dropdown.Trigger>
                 <Dropdown.Popover>
@@ -473,6 +480,8 @@ const Navbar = () => {
             </div>
           )}
         </header>
+
+        {/* Mobile Navigation Menu */}
         {isMenuOpen && (
           <div className="border-t border-separator md:hidden">
             <ul className="flex flex-col gap-2 p-4">
@@ -482,20 +491,30 @@ const Navbar = () => {
                 </Link>
               </li>
               <li>
-                <Link href="#" className="block py-2 font-medium text-accent">
+                <Link href="/dashboard" className="block py-2 font-medium text-accent">
                   Dashboard
                 </Link>
               </li>
               <li>
-                <Link href="#" className="block py-2">
+                <Link href="/pricing" className="block py-2">
                   Pricing
                 </Link>
               </li>
+              {/* ইউজার লগইন থাকলে মোবাইলেও Donation লিঙ্কটি দেখাবে */}
+              {user && (
+                <li>
+                  <Link href="/donation" className="block py-2">
+                    Donation
+                  </Link>
+                </li>
+              )}
               <li className="mt-4 flex flex-col gap-2 border-t border-separator pt-4">
-                <Link href="#" className="block py-2">
+                <Link href="/login" className="block py-2">
                   Login
                 </Link>
-                <Button className="w-full">Sign Up</Button>
+                <Link href="/register" className="block py-2">
+                  Sign Up
+                </Link>
               </li>
             </ul>
           </div>
