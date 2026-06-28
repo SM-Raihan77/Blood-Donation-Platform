@@ -17,20 +17,23 @@ const BloodDonationRequests = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  // ব্যাকএন্ড থেকে ডাটা ফেচ করা
+  //fatching pending requests
   useEffect(() => {
     const fetchPendingRequests = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/donation-requests?status=pending&page=${page}&limit=6`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/donation-requests?status=pending&page=${page}&limit=6`);
         const result = await res.json();
+        // console.log("Current Page:", page);
+        // console.log("API Response:", result);
+
 
         if (result.success) {
-          console.log(result);
+          // console.log(result);
           setRequests(result.data || []);
           setTotalPages(result.totalPages || 1);
         }
       } catch (error) {
-        console.error("ডাটা লোড করতে সমস্যা হয়েছে:", error);
+        console.error("problem with fetching pending requests:", error);
       } finally {
         setLoading(false);
       }
@@ -39,7 +42,7 @@ const BloodDonationRequests = () => {
     fetchPendingRequests();
   }, [page]);
 
-  // প্রাইভেট রুট প্রটেকশন এবং রিডাইরেকশন হ্যান্ডলার
+
   const handleViewDetails = (id) => {
     if (!session?.user) {
       alert("অনুমতি নেই! বিস্তারিত দেখতে আপনাকে অবশ্যই প্রথমে লগইন করতে হবে।");
@@ -49,7 +52,7 @@ const BloodDonationRequests = () => {
     }
   };
 
-  // কার্ড অ্যানিমেশনের ভ্যারিয়েন্ট (Stagger Effect)
+ 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -67,9 +70,9 @@ const BloodDonationRequests = () => {
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto">
 
-        {/* 📋 Section Header (লোগো উপরে এবং হেডিং বড় করা হয়েছে) */}
+   
         <div className="mb-12 text-center flex flex-col items-center justify-center">
-          <motion.div 
+          <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: "spring", stiffness: 260, damping: 20 }}
@@ -77,14 +80,14 @@ const BloodDonationRequests = () => {
           >
             🩸
           </motion.div>
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-3xl sm:text-4xl font-black text-gray-800 tracking-tight"
           >
             Pending Donation Requests
           </motion.h1>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
@@ -111,7 +114,7 @@ const BloodDonationRequests = () => {
           </div>
         ) : requests.length === 0 ? (
           /* 📭 Empty State */
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             className="bg-white rounded-2xl p-12 text-center border border-gray-100 shadow-sm max-w-md mx-auto mt-12"
@@ -122,7 +125,7 @@ const BloodDonationRequests = () => {
           </motion.div>
         ) : (
           /* 🗂️ Main Card Grid (Motion Added) */
-          <motion.div 
+          <motion.div
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
@@ -130,7 +133,10 @@ const BloodDonationRequests = () => {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
             {requests.map((request) => (
-              <motion.div
+
+              
+              
+              <div
                 key={request._id}
                 variants={cardVariants}
                 whileHover={{ y: -5 }}
@@ -179,7 +185,7 @@ const BloodDonationRequests = () => {
                   <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
                 </button>
 
-              </motion.div>
+              </div>
             ))}
           </motion.div>
         )}
@@ -200,11 +206,10 @@ const BloodDonationRequests = () => {
             <button
               key={index}
               onClick={() => setPage(index + 1)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                page === index + 1
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${page === index + 1
                   ? "bg-red-600 text-white shadow-md shadow-red-100"
                   : "border bg-white hover:bg-gray-100"
-              }`}
+                }`}
             >
               {index + 1}
             </button>

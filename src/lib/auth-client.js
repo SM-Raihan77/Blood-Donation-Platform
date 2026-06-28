@@ -2,7 +2,7 @@ import { createAuthClient } from "better-auth/react";
 
 export const authClient = createAuthClient({
     /** The base URL of the server (optional if you're using the same domain) */
-    baseURL: "http://localhost:3000", // 👈 এখানে কমা (,) মিসিং ছিল
+    baseURL: process.env.BETTER_AUTH_URL,// 
     user: {
         additionalFields: {
             phone: { type: "string" },
@@ -14,5 +14,5 @@ export const authClient = createAuthClient({
     },
 });
 
-// 👈 নিচের ভুল এক্সপোর্ট লাইনটি ডিলিট করে এটি ব্যবহার করুন:
+
 export const { signIn, signUp, useSession } = authClient;
