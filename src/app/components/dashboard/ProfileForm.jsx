@@ -6,7 +6,7 @@ import { Pencil, X } from "lucide-react";
 
 export default function ProfileForm() {
   const { data: session, isPending, refetch } = useSession();
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  const API_URL = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:5000";
 
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);

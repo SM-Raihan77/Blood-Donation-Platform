@@ -15,7 +15,7 @@ const BloodSearchPage = () => {
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+  const API_BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:5000';
 
   // Extracting actual data array from the JSON structure
   const districtsObj = districtsData.find(item => item && item.data);

@@ -26,7 +26,7 @@ const DashboardHome = () => {
         setLoading(true);
         
         // Axios-এর পরিবর্তে ডিফল্ট fetch ব্যবহার
-        const response = await fetch('http://localhost:5000/api/dashboard-stats');
+        const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/dashboard-stats`);
         
         // fetch-এ ডাটাকে ম্যানুয়ালি .json() দিয়ে কনভার্ট করতে হয়
         const result = await response.json(); 

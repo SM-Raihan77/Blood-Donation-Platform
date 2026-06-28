@@ -9,7 +9,7 @@ export default function DonationRequestDetailsPage() {
   const [request, setRequest] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  const API_URL = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:5000";
 
   useEffect(() => {
     const fetchRequestDetails = async () => {

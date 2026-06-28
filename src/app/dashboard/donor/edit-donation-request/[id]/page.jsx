@@ -8,7 +8,7 @@ export default function EditDonationRequestPage() {
   const { id } = useParams();
   const router = useRouter();
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  const API_URL = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:5000";
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);

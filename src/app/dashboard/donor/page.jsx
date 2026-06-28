@@ -17,6 +17,9 @@ export default function DashboardHome() {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  
+ 
 
   // ==========================
   // FETCH RECENT 3 REQUESTS
@@ -27,9 +30,10 @@ export default function DashboardHome() {
         if (!user?.email) return;
 
         setLoading(true);
+        
 
         const res = await fetch(
-          `http://localhost:5000/api/my-donation-requests?email=${user.email}&limit=3`,
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/api/donation-requests?status=pending&page=${page}&limit=3`,
           {
             method: "GET",
             credentials: "include",
@@ -38,12 +42,15 @@ export default function DashboardHome() {
         );
 
         const data = await res.json();
+      
+console.log("API Response:", data);
 
         if (!res.ok) {
           throw new Error(data?.message || "Failed to fetch requests");
         }
 
         setRequests(data?.data || []);
+        console.log("Fetched Data:", data.data);
       } catch (error) {
         console.error("Fetch requests error:", error);
       } finally {
@@ -59,8 +66,9 @@ export default function DashboardHome() {
   // ==========================
   const handleStatusChange = async (id, newStatus) => {
     try {
+      
       const res = await fetch(
-        `http://localhost:5000/api/donation-requests/${id}/status`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/donation-requests/${id}/status`,
         {
           method: "PATCH",
           headers: {
@@ -102,7 +110,7 @@ export default function DashboardHome() {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/donation-requests/${id}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/donation-requests/${id}`,
         {
           method: "DELETE",
           credentials: "include",
@@ -139,7 +147,7 @@ export default function DashboardHome() {
       {/* --- WELCOME SECTION --- */}
       <div className="bg-red-50 border border-red-200 p-6 rounded-xl mb-8 shadow-sm">
         <h1 className="text-2xl md:text-3xl font-bold text-red-600">
-          Welcome, {donorUser.name}! 🏠
+          Welcome, {donorUser.name}! 
         </h1>
         <p className="text-gray-600 mt-1">
           Manage your blood donation requests from here.
@@ -151,7 +159,7 @@ export default function DashboardHome() {
         <div className="bg-white shadow-md rounded-xl p-6 border border-gray-100">
           <div className="flex items-center justify-between mb-4 border-b pb-3">
             <h2 className="text-xl font-semibold text-gray-700">
-              Your Recent Donation Requests (Max 3)
+              Your Recent Donation Requests (Latest: 3)
             </h2>
 
             <Link

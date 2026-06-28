@@ -11,7 +11,7 @@ const AllBloodDonationRequests = () => {
   const fetchAllRequests = async () => {
     try {
       setLoading(true);
-      const res = await fetch('http://localhost:5000/api/donation-requests');
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/donation-requests`);
       const result = await res.json();
       if (result.success) {
         setRequests(result.data);
@@ -30,7 +30,7 @@ const AllBloodDonationRequests = () => {
   // ২. রিকোয়েস্টের স্ট্যাটাস পরিবর্তন করা (Pending -> In Progress -> Done/Canceled)
   const handleStatusChange = async (id, newStatus) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/donation-requests/${id}/status`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/donation-requests/${id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
@@ -50,7 +50,7 @@ const AllBloodDonationRequests = () => {
     if (!window.confirm("আপনি কি নিশ্চিতভাবে এই রক্তের রিকোয়েস্টটি ডিলিট করতে চান?")) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/donation-requests/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/donation-requests/${id}`, {
         method: 'DELETE',
       });
       const result = await res.json();

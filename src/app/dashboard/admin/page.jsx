@@ -25,7 +25,7 @@ const DashboardHome = () => {
       try {
         setLoading(true);
         
-        const response = await fetch('http://localhost:5000/api/dashboard-stats');
+        const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/dashboard-stats`);
         
         // Convert response data to JSON
         const result = await response.json(); 

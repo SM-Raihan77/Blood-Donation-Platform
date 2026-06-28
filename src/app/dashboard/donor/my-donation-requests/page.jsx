@@ -27,9 +27,7 @@ export default function AllDonationRequestsPage() {
       // console.log("Page:", page);
       try {
         const res = await fetch(
-          `http://localhost:5000/api/my-donation-requests?email=${encodeURIComponent(
-            session.user.email
-          )}&page=${page}&limit=6`,
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/api/donation-requests?status=pending&page=${page}&limit=6`,
           {
             method: "GET",
             credentials: "include",

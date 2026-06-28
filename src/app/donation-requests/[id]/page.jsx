@@ -23,7 +23,7 @@ const DonationRequestDetails = ({ params }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // API Base URL (Environment Variable বা fallback localhost)
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+  const API_BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:5000';
 
   // 🔒 সিকিউরিটি চেক: লগইন না থাকলে রিডাইরেক্ট
   useEffect(() => {

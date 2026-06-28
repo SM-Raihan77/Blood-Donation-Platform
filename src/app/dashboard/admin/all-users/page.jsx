@@ -12,7 +12,7 @@ const AllUsers = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`http://localhost:5000/api/users?status=${statusFilter}`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users`);
       const result = await res.json();
       if (result.success) {
         setUsers(result.data);
@@ -31,7 +31,7 @@ const AllUsers = () => {
   // স্ট্যাটাস ও রোল আপডেটের জন্য জেনেরিক হ্যান্ডলার
   const handleUpdateUser = async (email, updateData) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/users/${email}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/${email}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updateData),
