@@ -1,65 +1,284 @@
+
+// 'use client';
+// import React, { useState, useEffect } from 'react';
+// import { useRouter } from 'next/navigation';
+// import { authClient } from '@/lib/auth-client';
+// import { MapPin, Calendar, Clock, User, ArrowRight, Heart } from 'lucide-react';
+
+
+// const BloodDonationRequests = () => {
+//   const router = useRouter();
+//   const { data: session, isPending: isAuthLoading } = authClient.useSession();
+//   const [requests, setRequests] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [page, setPage] = useState(1);
+//   const [totalPages, setTotalPages] = useState(1);
+
+//   // ব্যাকএন্ড থেকে ডাটা ফেচ করা
+//   useEffect(() => {
+//     const fetchPendingRequests = async () => {
+//       try {
+//         // ব্যাকএন্ড API থেকে পেন্ডিং রিকোয়েস্টগুলো নেওয়া হচ্ছে
+//         const res = await fetch(`http://localhost:5000/api/donation-requests?status=pending&page=${page}&limit=6`);
+//         const result = await res.json();
+
+//         if (result.success) {
+//           console.log(result);
+//           setRequests(result.data || []);
+//           setTotalPages(result.totalPages || 1);
+//         }
+//       } catch (error) {
+//         console.error("ডাটা লোড করতে সমস্যা হয়েছে:", error);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchPendingRequests();
+//   }, [page]);
+
+//   // প্রাইভেট রুট প্রটেকশন এবং রিডাইরেকশন হ্যান্ডলার
+//   const handleViewDetails = (id) => {
+//     if (!session?.user) {
+//       // ইউজার লগইন না থাকলে মেসেজ দেখিয়ে লগইন পেজে পাঠানো হবে
+//       alert("অনুমতি নেই! বিস্তারিত দেখতে আপনাকে অবশ্যই প্রথমে লগইন করতে হবে।");
+//       router.push('/login');
+//     } else {
+//       // লগইন থাকলে ডাইনামিক ডিটেইলস পেজে রিডাইরেক্ট করবে
+//       router.push(`/donation-requests/${id}`);
+//     }
+//   };
+//   console.log("Total Pages:", totalPages);
+//   console.log("Current Page:", page);
+//   return (
+//     <div className="p-6 bg-gray-50 min-h-screen">
+//       <div className="max-w-6xl mx-auto">
+
+//         {/* 📋 Section Header */}
+//         <div className="mb-8 text-center">
+//           <h1 className="text-2xl font-black text-gray-800 flex items-center justify-center gap-2">
+//             Pending Donation Requests 🩸
+//           </h1>
+//           <p className="text-gray-500 text-sm mt-1">
+//             List of currently active and pending urgent blood requests.
+//           </p>
+//         </div>
+
+//         {/* ⏳ Data Loading Condition (Skeleton Loading Effect) */}
+//         {loading || isAuthLoading ? (
+//           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+//             {[1, 2, 3].map((n) => (
+//               <div key={n} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm animate-pulse space-y-4">
+//                 <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+//                 <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+//                 <div className="space-y-2 pt-2">
+//                   <div className="h-3 bg-gray-200 rounded w-full"></div>
+//                   <div className="h-3 bg-gray-200 rounded w-5/6"></div>
+//                 </div>
+//                 <div className="h-10 bg-gray-200 rounded-xl w-full pt-4"></div>
+//               </div>
+//             ))}
+//           </div>
+//         ) : requests.length === 0 ? (
+//           /* 📭 Empty State */
+//           <div className="bg-white rounded-2xl p-12 text-center border border-gray-100 shadow-sm max-w-md mx-auto mt-12">
+//             <Heart className="text-gray-300 mx-auto mb-3" size={40} />
+//             <h3 className="text-lg font-bold text-gray-700">No requests found</h3>
+//             <p className="text-gray-400 text-sm mt-1">There are no pending blood requests at this moment.</p>
+//           </div>
+//         ) : (
+//           /* 🗂️ Main Card Grid */
+//           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+//             {requests.map((request) => (
+//               <div
+//                 key={request._id}
+//                 className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col justify-between hover:shadow-md transition-shadow relative overflow-hidden group"
+//               >
+//                 {/* 🩸 Blood Group Badge */}
+//                 <div className="absolute top-4 right-4 bg-red-50 text-red-600 border border-red-100 font-black px-3 py-1 rounded-xl text-sm">
+//                   {request.bloodGroup}
+//                 </div>
+
+//                 <div>
+//                   {/* Recipient Name Profile Label */}
+//                   <div className="flex items-center gap-2 text-gray-400 text-xs mb-1">
+//                     <User size={14} />
+//                     <span>Recipient Name</span>
+//                   </div>
+//                   <h3 className="text-lg font-bold text-gray-800 mb-4 truncate">
+//                     {request.recipientName}
+//                   </h3>
+
+//                   {/* 📍 Location, Date & Time Meta */}
+//                   <div className="space-y-2.5 text-sm text-gray-600 mb-6">
+//                     {/* Location */}
+//                     <div className="flex items-start gap-2.5">
+//                       <MapPin className="text-gray-400 mt-0.5 shrink-0" size={16} />
+//                       <span className="truncate">
+//                         {request.hospitalName || `${request.upazila}, ${request.district}`}
+//                       </span>
+//                     </div>
+//                     {/* Date */}
+//                     <div className="flex items-center gap-2.5">
+//                       <Calendar className="text-gray-400 shrink-0" size={16} />
+//                       <span>{request.donationDate}</span>
+//                     </div>
+//                     {/* Time */}
+//                     <div className="flex items-center gap-2.5">
+//                       <Clock className="text-gray-400 shrink-0" size={16} />
+//                       <span>{request.donationTime}</span>
+//                     </div>
+//                   </div>
+//                 </div>
+
+//                 {/* 🔘 View Button */}
+//                 <button
+//                   onClick={() => handleViewDetails(request._id)}
+//                   className="w-full bg-gray-50 group-hover:bg-red-600 text-gray-700 group-hover:text-white font-bold py-2.5 px-4 rounded-xl transition-all duration-200 text-sm flex items-center justify-center gap-2 border border-gray-100 group-hover:border-transparent"
+//                 >
+//                   <span>View Details</span>
+//                   <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+//                 </button>
+
+//               </div>
+//             ))}
+//           </div>
+//         )}
+//       </div>
+//       <div className="flex justify-center mt-8">
+//         <div className="flex justify-center items-center gap-2 mt-8">
+//           <button
+//             onClick={() => setPage(page - 1)}
+//             disabled={page === 1}
+//             className="px-4 py-2 rounded-lg border disabled:opacity-50 disabled:cursor-not-allowed"
+//           >
+//             Previous
+//           </button>
+
+//           {Array.from({ length: totalPages }, (_, index) => (
+//             <button
+//               key={index}
+//               onClick={() => setPage(index + 1)}
+//               className={`px-4 py-2 rounded-lg ${page === index + 1
+//                 ? "bg-red-600 text-white"
+//                 : "border hover:bg-gray-100"
+//                 }`}
+//             >
+//               {index + 1}
+//             </button>
+//           ))}
+
+//           <button
+//             onClick={() => setPage(page + 1)}
+//             disabled={page === totalPages}
+//             className="px-4 py-2 rounded-lg border disabled:opacity-50 disabled:cursor-not-allowed"
+//           >
+//             Next
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default BloodDonationRequests;
+
+
+
+
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { authClient } from '@/lib/auth-client';
 import { MapPin, Calendar, Clock, User, ArrowRight, Heart } from 'lucide-react';
+import { motion } from 'motion/react'; // Framer Motion ইম্পোর্ট করা হয়েছে
 
 const BloodDonationRequests = () => {
   const router = useRouter();
   const { data: session, isPending: isAuthLoading } = authClient.useSession();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   // ব্যাকএন্ড থেকে ডাটা ফেচ করা
   useEffect(() => {
     const fetchPendingRequests = async () => {
       try {
-        // ব্যাকএন্ড API থেকে পেন্ডিং রিকোয়েস্টগুলো নেওয়া হচ্ছে
-        const res = await fetch('http://localhost:5000/api/donation-requests?status=pending');
+        const res = await fetch(`http://localhost:5000/api/donation-requests?status=pending&page=${page}&limit=6`);
         const result = await res.json();
-        
+
         if (result.success) {
-          // শুধু pending স্ট্যাটাসের ডাটা ফিল্টার করে রাখা হলো
-          const pendingData = result.data.filter(req => req.status === 'pending');
-          setRequests(pendingData);
+          console.log(result);
+          setRequests(result.data || []);
+          setTotalPages(result.totalPages || 1);
         }
       } catch (error) {
-        console.error("ডাটা লোড করতে সমস্যা হয়েছে:", error);
+        console.error("ডাটা লোড করতে সমস্যা হয়েছে:", error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchPendingRequests();
-  }, []);
+  }, [page]);
 
   // প্রাইভেট রুট প্রটেকশন এবং রিডাইরেকশন হ্যান্ডলার
   const handleViewDetails = (id) => {
     if (!session?.user) {
-      // ইউজার লগইন না থাকলে মেসেজ দেখিয়ে লগইন পেজে পাঠানো হবে
       alert("অনুমতি নেই! বিস্তারিত দেখতে আপনাকে অবশ্যই প্রথমে লগইন করতে হবে।");
       router.push('/login');
     } else {
-      // লগইন থাকলে ডাইনামিক ডিটেইলস পেজে রিডাইরেক্ট করবে
-    router.push(`/donation-requests/${id}`);
+      router.push(`/donation-requests/${id}`);
     }
+  };
+
+  // কার্ড অ্যানিমেশনের ভ্যারিয়েন্ট (Stagger Effect)
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } }
   };
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto">
-        
-        {/* 📋 সেকশন হেডার */}
-        <div className="mb-8 text-center md:text-left">
-          <h1 className="text-2xl font-black text-gray-800 flex items-center justify-center md:justify-start gap-2">
-            Pending Donation Requests 🩸
-          </h1>
-          <p className="text-gray-500 text-sm mt-1">
-            বর্তমানে সক্রিয় এবং অপেক্ষমাণ রক্তের জরুরি রিকোয়েস্টগুলোর তালিকা।
-          </p>
+
+        {/* 📋 Section Header (লোগো উপরে এবং হেডিং বড় করা হয়েছে) */}
+        <div className="mb-12 text-center flex flex-col items-center justify-center">
+          <motion.div 
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 260, damping: 20 }}
+            className="mb-3 p-3 bg-red-100 text-red-600 rounded-full text-3xl"
+          >
+            🩸
+          </motion.div>
+          <motion.h1 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-3xl sm:text-4xl font-black text-gray-800 tracking-tight"
+          >
+            Pending Donation Requests
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="text-gray-500 text-sm mt-2"
+          >
+            List of currently active and pending urgent blood requests.
+          </motion.p>
         </div>
 
-        {/* ⏳ ডাটা লোডিং কন্ডিশন (Skeleton Loading Effect) */}
+        {/* ⏳ Data Loading Condition (Skeleton Loading Effect) */}
         {loading || isAuthLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3].map((n) => (
@@ -75,19 +294,31 @@ const BloodDonationRequests = () => {
             ))}
           </div>
         ) : requests.length === 0 ? (
-          // 📭 ডাটা না থাকলে খালি স্টেট দেখাবে
-          <div className="bg-white rounded-2xl p-12 text-center border border-gray-100 shadow-sm max-w-md mx-auto mt-12">
-            <Heart className="text-gray-300 mx-auto mb-3" size={40} />
-            <h3 className="text-lg font-bold text-gray-700">কোনো আবেদন পাওয়া যায়নি</h3>
-            <p className="text-gray-400 text-sm mt-1">এই মুহূর্তে কোনো পেন্ডিং ব্লাড রিকোয়েস্ট নেই।</p>
-          </div>
+          /* 📭 Empty State */
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl p-12 text-center border border-gray-100 shadow-sm max-w-md mx-auto mt-12"
+          >
+            <Heart className="text-gray-300 mx-auto mb-3 animate-pulse" size={40} />
+            <h3 className="text-lg font-bold text-gray-700">No requests found</h3>
+            <p className="text-gray-400 text-sm mt-1">There are no pending blood requests at this moment.</p>
+          </motion.div>
         ) : (
-          // 🗂️ মেইন কার্ড গ্রিড
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          /* 🗂️ Main Card Grid (Motion Added) */
+          <motion.div 
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
             {requests.map((request) => (
-              <div 
-                key={request._id} 
-                className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col justify-between hover:shadow-md transition-shadow relative overflow-hidden group"
+              <motion.div
+                key={request._id}
+                variants={cardVariants}
+                whileHover={{ y: -5 }}
+                className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col justify-between hover:shadow-md transition-all relative overflow-hidden group"
               >
                 {/* 🩸 Blood Group Badge */}
                 <div className="absolute top-4 right-4 bg-red-50 text-red-600 border border-red-100 font-black px-3 py-1 rounded-xl text-sm">
@@ -97,7 +328,7 @@ const BloodDonationRequests = () => {
                 <div>
                   {/* Recipient Name Profile Label */}
                   <div className="flex items-center gap-2 text-gray-400 text-xs mb-1">
-                    <User size={14} /> 
+                    <User size={14} />
                     <span>Recipient Name</span>
                   </div>
                   <h3 className="text-lg font-bold text-gray-800 mb-4 truncate">
@@ -106,19 +337,16 @@ const BloodDonationRequests = () => {
 
                   {/* 📍 Location, Date & Time Meta */}
                   <div className="space-y-2.5 text-sm text-gray-600 mb-6">
-                    {/* Location */}
                     <div className="flex items-start gap-2.5">
                       <MapPin className="text-gray-400 mt-0.5 shrink-0" size={16} />
                       <span className="truncate">
                         {request.hospitalName || `${request.upazila}, ${request.district}`}
                       </span>
                     </div>
-                    {/* Date */}
                     <div className="flex items-center gap-2.5">
                       <Calendar className="text-gray-400 shrink-0" size={16} />
                       <span>{request.donationDate}</span>
                     </div>
-                    {/* Time */}
                     <div className="flex items-center gap-2.5">
                       <Clock className="text-gray-400 shrink-0" size={16} />
                       <span>{request.donationTime}</span>
@@ -135,10 +363,45 @@ const BloodDonationRequests = () => {
                   <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
                 </button>
 
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
+      </div>
+
+      {/* 🔢 Pagination Control */}
+      <div className="flex justify-center mt-8">
+        <div className="flex justify-center items-center gap-2 mt-8">
+          <button
+            onClick={() => setPage(page - 1)}
+            disabled={page === 1}
+            className="px-4 py-2 rounded-lg border bg-white disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+          >
+            Previous
+          </button>
+
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index}
+              onClick={() => setPage(index + 1)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                page === index + 1
+                  ? "bg-red-600 text-white shadow-md shadow-red-100"
+                  : "border bg-white hover:bg-gray-100"
+              }`}
+            >
+              {index + 1}
+            </button>
+          ))}
+
+          <button
+            onClick={() => setPage(page + 1)}
+            disabled={page === totalPages}
+            className="px-4 py-2 rounded-lg border bg-white disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );
