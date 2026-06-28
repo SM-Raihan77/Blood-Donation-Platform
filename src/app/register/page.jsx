@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useRouter } from 'next/navigation'; // 💡 ক্লায়েন্ট সাইড রিডাইরেক্টের জন্য useRouter ইমপোর্ট করা হলো
 import {
   FaUser,
   FaEnvelope,
@@ -10,14 +11,12 @@ import {
   FaMapMarkerAlt,
   FaMap,
   FaLock,
-
 } from 'react-icons/fa';
 
 // Import JSON data
 import districtsData from '@/data/districts.json';
 import upazilasData from '@/data/upazilas.json';
 import { authClient } from '@/lib/auth-client';
-import { redirect } from 'next/dist/server/api-utils';
 
 // JSON data handling logic 
 const findMainData = (jsonFile) => {
@@ -30,6 +29,8 @@ const allDistricts = findMainData(districtsData);
 const allUpazilas = findMainData(upazilasData);
 
 const RegisterPage = () => {
+  const router = useRouter(); // 💡 useRouter হুক ইনিশিয়েট করা হলো
+  
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm({
     defaultValues: {
       fullName: '',
@@ -49,7 +50,6 @@ const RegisterPage = () => {
   const selectedBloodGroup = watch('bloodGroup');
   const password = watch('password');
   const [filteredUpazilas, setFilteredUpazilas] = useState([]);
-  const [photoPreview, setPhotoPreview] = useState(null);
   const imageUrl = watch("image");
 
   const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
@@ -68,10 +68,8 @@ const RegisterPage = () => {
     }
   }, [selectedDistrict, setValue]);
 
-  // function  to handle form submission
-
+  // function to handle form submission
   const onSubmit = async (formData) => {
-    // console.log(" FORM START", formData);
     const selectedDistrictData = allDistricts.find(
       (d) => String(d.id) === String(formData.district)
     );
@@ -80,22 +78,7 @@ const RegisterPage = () => {
       (u) => String(u.id) === String(formData.upazila)
     );
 
-    const payload = {
-      email: formData.email,
-      password: formData.password,
-      name: formData.fullName,
-      phone: formData.phone,
-      gender: formData.gender,
-      bloodGroup: formData.bloodGroup,
-      district: selectedDistrictData?.name || "",
-      upazila: selectedUpazilaData?.name || "",
-    };
-
-    // console.log("PAYLOAD:", payload);
-
     try {
-
-
       const { data, error } = await authClient.signUp.email({
         email: formData.email,
         password: formData.password,
@@ -109,14 +92,15 @@ const RegisterPage = () => {
       });
 
       if (error) {
-        console.error(error);
+        console.error("Signup failed:", error);
         return;
       }
 
-      // console.log('Signup successful', data);
-      redirect('/login');
+      // 💡 রেজিস্ট্রেশন সফল হলে সরাসরি হোম পেজে (`/`) রিডাইরেক্ট করবে
+      router.push('/');
+      
     } catch (err) {
-      console.error(err);
+      console.error("Something went wrong during signup:", err);
     }
   };
 
@@ -139,7 +123,6 @@ const RegisterPage = () => {
 
           {/* Profile Photo */}
           <div className="flex flex-col items-center mb-6">
-
             <div className="w-24 h-24 bg-orange-50 rounded-full flex items-center justify-center border-2 border-gray-200 overflow-hidden">
               {imageUrl ? (
                 <img
@@ -159,20 +142,18 @@ const RegisterPage = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Profile Image URL
               </label>
-
               <input
                 type="url"
                 placeholder="https://example.com/profile.jpg"
                 {...register("image")}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
               />
-
               <p className="text-xs text-gray-500 mt-1">
                 Paste a direct image URL
               </p>
             </div>
-
           </div>
+
           {/* Full Name & Email */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -292,7 +273,6 @@ const RegisterPage = () => {
           {/* Blood Group Selector */}
           <div>
             <label className="block text-xs font-semibold text-gray-700 mb-1.5">Blood Group</label>
-
             <input
               type="hidden"
               {...register('bloodGroup', { required: 'Blood group is required' })}

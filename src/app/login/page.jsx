@@ -13,6 +13,7 @@ import {
 } from "@heroui/react";
 import { Mail, Lock } from "lucide-react"; 
 import React from "react";
+import Link from "next/link"; // 💡 Navigation-এর জন্য Link ইমপোর্ট করা হলো
 
 export default function SignInPage() {
   const onSubmit = async (e) => {
@@ -32,7 +33,7 @@ export default function SignInPage() {
       <div className="w-full max-w-2xl bg-white rounded-3xl shadow-sm border border-gray-100 p-8 md:p-12">
         
         <div className="text-center mb-8">
-          {/* inline style দিয়ে ব্লাড-রেড কালার নিশ্চিত করা হয়েছে */}
+          {/* Confirmed blood-red color using inline styles */}
           <h1 
             className="text-3xl md:text-4xl font-bold mb-2" 
             style={{ color: "#b91c1c" }}
@@ -48,7 +49,7 @@ export default function SignInPage() {
           <Form onSubmit={onSubmit} className="space-y-6">
             <Fieldset className="w-full space-y-5">
               
-              {/* ইমেইল ফিল্ড */}
+              {/* Email Field */}
               <TextField isRequired name="email" type="email" className="w-full">
                 <Label className="text-gray-700 font-medium mb-1.5 block">
                   Email Address <span className="text-red-500">*</span>
@@ -64,7 +65,7 @@ export default function SignInPage() {
                 <FieldError className="text-xs text-[#b91c1c] mt-1" />
               </TextField>
 
-              {/* পাসওয়ার্ড ফিল্ড */}
+              {/* Password Field */}
               <TextField isRequired name="password" type="password" className="w-full">
                 <Label className="text-gray-700 font-medium mb-1.5 block">
                   Password <span className="text-red-500">*</span>
@@ -82,7 +83,7 @@ export default function SignInPage() {
 
             </Fieldset>
 
-            {/* বাটনটি যেন কোনোভাবেই ডিফল্ট ব্লু কালার না পায় তাই inline style ব্যবহার করা হয়েছে */}
+            {/* Custom styled red submit button */}
             <Button 
               type="submit" 
               className="w-full text-white font-semibold h-12 rounded-xl text-base shadow-sm transition-all mt-4"
@@ -92,6 +93,19 @@ export default function SignInPage() {
             </Button>
           </Form>
         </Surface>
+
+        {/* 💡 Register redirect link section added below the form */}
+        <div className="text-center text-sm text-gray-500 mt-6">
+          Don't have an account?{" "}
+          <Link 
+            href="/register" 
+            className="font-semibold hover:underline transition-colors"
+            style={{ color: "#b91c1c" }}
+          >
+            Register here
+          </Link>
+        </div>
+
       </div>
     </div>
   );
