@@ -1,326 +1,16 @@
-// // "use client";
-
-// // import { useState, useEffect, useRef } from "react";
-// // import Link from "next/link";
-// // import { usePathname } from "next/navigation";
-// // import { FaTicketAlt, FaUser, FaSignOutAlt, FaThLarge } from "react-icons/fa";
-// // // import Logo from "./Logo";
-// // // import ThemeSwitcher from "./ThemeSwitcher";react-icons/fa"
-
-// // export default function Navbar() {
-// //   const pathname = usePathname();
-// //   const [isLoggedIn, setIsLoggedIn] = useState(true);
-// //   const [dropdownOpen, setDropdownOpen] = useState(false);
-// //   const dropdownRef = useRef(null);
-
-// //   useEffect(() => {
-// //     function handleClickOutside(event) {
-// //       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-// //         setDropdownOpen(false);
-// //       }
-// //     }
-// //     document.addEventListener("mousedown", handleClickOutside);
-// //     return () => document.removeEventListener("mousedown", handleClickOutside);
-// //   }, []);
-
-// //   const handleLogout = () => {
-// //     setIsLoggedIn(false);
-// //     setDropdownOpen(false);
-// //     alert("Logged Out! (Design Only)");
-// //   };
-
-
-
-// //   const mockUser = {
-// //     name: "Jane Doe",
-// //     email: "jane@example.com",
-// //     role: "attendee",
-// //     image: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde"
-// //   };
-
-// //   return (
-// //     <nav className="sticky top-0 z-50 w-full border-b border-white/5 bg-slate-950/65 backdrop-blur-md py-3.5 px-6">
-// //       <div className="max-w-7xl mx-auto flex items-center justify-between">
-// //         {/* LOGO */}
-// //         {/* <Logo /> */}
-
-// //         {/* NAVIGATION LINKS */}
-// //         <div className="hidden sm:flex items-center gap-8">
-// //           <Link
-// //             href="/"
-// //             className={`text-sm font-medium transition-colors ${pathname === "/" ? "text-pink-500 font-semibold" : "text-slate-300 hover:text-white"}`}
-// //           >
-// //             Home
-// //           </Link>
-// //           <Link
-// //             href="/events"
-// //             className={`text-sm font-medium transition-colors ${pathname.startsWith("/events") ? "text-pink-500 font-semibold" : "text-slate-300 hover:text-white"}`}
-// //           >
-// //             Donation Requests
-// //           </Link>
-// //           {isLoggedIn && (
-// //             <Link
-// //               href={"/"}
-// //               className={`text-sm font-medium transition-colors ${pathname.startsWith("/dashboard") ? "text-pink-500 font-semibold" : "text-slate-300 hover:text-white"}`}
-// //             >
-// //               Dashboard
-// //             </Link>
-// //           )}
-// //         </div>
-
-// //         {/* RIGHT ACTIONS */}
-// //         <div className="flex items-center gap-4">
-
-
-// //           {!isLoggedIn && (
-// //             <div className="flex items-center gap-3">
-// //               <button
-// //                 onClick={() => setIsLoggedIn(true)}
-// //                 className="inline-flex items-center justify-center font-semibold text-xs text-slate-300 hover:text-white h-9 px-4 rounded-xl hover:bg-white/5 transition"
-// //               >
-// //                 Login
-// //               </button>
-// //               <Link
-// //                 href="/register"
-// //                 className="inline-flex items-center justify-center font-semibold text-xs bg-gradient-to-r from-pink-500 to-indigo-600 text-white shadow-lg shadow-pink-500/10 hover:shadow-pink-500/20 transition h-9 px-4 rounded-xl"
-// //               >
-// //                 Sign Up
-// //               </Link>
-// //             </div>
-// //           )}
-
-// //           {isLoggedIn && (
-// //             <div className="relative" ref={dropdownRef}>
-// //               <button
-// //                 onClick={() => setDropdownOpen(!dropdownOpen)}
-// //                 className="flex items-center transition-transform hover:scale-105 outline-none focus:outline-none cursor-pointer"
-// //               >
-// //                 <img
-// //                   className="w-9 h-9 rounded-full object-cover border border-pink-500 shadow-md shadow-pink-500/10"
-// //                   src={mockUser.image}
-// //                   alt="avatar"
-// //                 />
-// //               </button>
-
-// //               {dropdownOpen && (
-// //                 <div className="absolute right-0 mt-3 w-56 bg-slate-900/95 border border-white/10 rounded-2xl shadow-2xl backdrop-blur-xl py-2 z-55 animate-in fade-in slide-in-from-top-2 duration-200">
-// //                   {/* User info */}
-// //                   <div className="px-4 py-2.5 border-b border-white/5 mb-1.5 cursor-default">
-// //                     <p className="text-[10px] text-pink-400 font-bold uppercase tracking-wider">
-// //                       {mockUser.role} Account
-// //                     </p>
-// //                     <p className="font-bold text-white text-sm mt-0.5">{mockUser.name}</p>
-// //                     <p className="text-[11px] text-slate-400 truncate mt-0.5">{mockUser.email}</p>
-// //                   </div>
-
-// //                   {/* Actions */}
-// //                   <Link
-// //                     href="/dashboard/organizer"
-// //                     onClick={() => setDropdownOpen(false)}
-// //                     className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition cursor-pointer"
-// //                   >
-// //                     <FaThLarge className="text-slate-400 text-sm shrink-0" />
-// //                     <span>My Dashboard</span>
-// //                   </Link>
-
-// //                   <Link
-// //                     href={`/dashboard/${mockUser.role}`}
-// //                     onClick={() => setDropdownOpen(false)}
-// //                     className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition cursor-pointer"
-// //                   >
-// //                     <FaUser className="text-slate-400 text-sm shrink-0" />
-// //                     <span>Profile Settings</span>
-// //                   </Link>
-
-// //                   <div className="border-t border-white/5 my-1.5" />
-
-// //                   <button
-// //                     onClick={handleLogout}
-// //                     className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-xs font-semibold text-red-400 hover:text-red-300 hover:bg-red-500/5 transition cursor-pointer"
-// //                   >
-// //                     <FaSignOutAlt className="text-sm shrink-0 text-red-400" />
-// //                     <span>Log Out</span>
-// //                   </button>
-// //                 </div>
-// //               )}
-// //             </div>
-// //           )}
-// //         </div>
-// //       </div>
-// //     </nav>
-// //   );
-// // }
-
-
-
-// "use client";
-
-// import { useState, useEffect, useRef } from "react";
-// import Link from "next/link";
-// import { usePathname } from "next/navigation";
-// import { FaTicketAlt, FaUser, FaSignOutAlt, FaThLarge } from "react-icons/fa";
-// // import Logo from "./Logo";
-// // import ThemeSwitcher from "./ThemeSwitcher";
-// import { useRouter } from "next/navigation";
-// import { authClient, useSession } from "@/lib/auth-client";
-// import Image from "next/image";
-
-// export default function Navbar() {
-//   const pathname = usePathname();
-//   const router = useRouter();
-//   const { data: session } = useSession();
-
-//   const [dropdownOpen, setDropdownOpen] = useState(false);
-//   const dropdownRef = useRef(null);
-
-//   useEffect(() => {
-//     function handleClickOutside(event) {
-//       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-//         setDropdownOpen(false);
-//       }
-//     }
-//     document.addEventListener("mousedown", handleClickOutside);
-//     return () => document.removeEventListener("mousedown", handleClickOutside);
-//   }, []);
-
-//   const handleLogout = async () => {
-//     await authClient.signOut();
-//     router.push("/");
-//   };
-//   // console.log(session);
-
-
-//   return (
-//     <nav className="sticky top-0 z-50 w-full border-b border-white/5 bg-slate-950/65 backdrop-blur-md py-3.5 px-6">
-//       <div className="max-w-7xl mx-auto flex items-center justify-between">
-//         {/* LOGO */}
-//         {/* <Logo /> */}
-
-//         {/* NAVIGATION LINKS */}
-//         <div className="hidden sm:flex items-center gap-8">
-//           <Link
-//             href="/"
-//             className={`text-sm font-medium transition-colors ${pathname === "/" ? "text-pink-500 font-semibold" : "text-slate-300 hover:text-white"}`}
-//           >
-//             Home
-//           </Link>
-//           <Link
-//             href="/events"
-//             className={`text-sm font-medium transition-colors ${pathname.startsWith("/events") ? "text-pink-500 font-semibold" : "text-slate-300 hover:text-white"}`}
-//           >
-//             Browse Events
-//           </Link>
-//           {session && session?.user && (
-//             <Link
-//               href={`/dashboard/${session?.user?.role}`}
-//               className={`text-sm font-medium transition-colors ${pathname.startsWith("/dashboard") ? "text-pink-500 font-semibold" : "text-slate-300 hover:text-white"}`}
-//             >
-//               Dashboard
-//             </Link>
-//           )}
-//         </div>
-
-//         {/* RIGHT ACTIONS */}
-//         <div className="flex items-center gap-4">
-
-
-//           {!session && (
-//             <div className="flex items-center gap-3">
-//               <Link href="/login">
-//                 <button
-//                   className="inline-flex items-center justify-center font-semibold text-xs text-slate-300 hover:text-white h-9 px-4 rounded-xl hover:bg-white/5 transition"
-//                 >
-//                   Login
-//                 </button>
-//               </Link>
-//               <Link
-//                 href="/register"
-//                 className="inline-flex items-center justify-center font-semibold text-xs bg-gradient-to-r from-pink-500 to-indigo-600 text-white shadow-lg shadow-pink-500/10 hover:shadow-pink-500/20 transition h-9 px-4 rounded-xl"
-//               >
-//                 Sign Up
-//               </Link>
-//             </div>
-//           )}
-
-//           {session && session?.user && (
-//             <div className="relative" ref={dropdownRef}>
-//               <button
-//                 onClick={() => setDropdownOpen(!dropdownOpen)}
-//                 className="flex items-center transition-transform hover:scale-105 outline-none focus:outline-none cursor-pointer"
-//               >
-//                 <Image
-//                   width={20}
-//                   height={20}
-//                   className="w-9 h-9 rounded-full object-cover border border-pink-500 shadow-md shadow-pink-500/10"
-//                   src={session?.user?.image}
-//                   alt="avatar"
-//                 />
-//               </button>
-
-//               {dropdownOpen && (
-//                 <div className="absolute right-0 mt-3 w-56 bg-slate-900/95 border border-white/10 rounded-2xl shadow-2xl backdrop-blur-xl py-2 z-55 animate-in fade-in slide-in-from-top-2 duration-200">
-//                   {/* User info */}
-//                   <div className="px-4 py-2.5 border-b border-white/5 mb-1.5 cursor-default">
-//                     <p className="text-[10px] text-pink-400 font-bold uppercase tracking-wider">
-//                       {session.user.role} Account
-//                     </p>
-//                     <p className="font-bold text-white text-sm mt-0.5">{session.user.name}</p>
-//                     <p className="text-[11px] text-slate-400 truncate mt-0.5">{session.user.email}</p>
-//                   </div>
-
-//                   {/* Actions */}
-//                   <Link
-//                     href="/dashboard/organizer"
-//                     onClick={() => setDropdownOpen(false)}
-//                     className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition cursor-pointer"
-//                   >
-//                     <FaThLarge className="text-slate-400 text-sm shrink-0" />
-//                     <span>My Dashboard</span>
-//                   </Link>
-
-//                   <Link
-//                     href={`/dashboard/${session.user.role}`}
-//                     onClick={() => setDropdownOpen(false)}
-//                     className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition cursor-pointer"
-//                   >
-//                     <FaUser className="text-slate-400 text-sm shrink-0" />
-//                     <span>Profile Settings</span>
-//                   </Link>
-
-//                   <div className="border-t border-white/5 my-1.5" />
-
-//                   <button
-//                     onClick={handleLogout}
-//                     className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-xs font-semibold text-red-400 hover:text-red-300 hover:bg-red-500/5 transition cursor-pointer"
-//                   >
-//                     <FaSignOutAlt className="text-sm shrink-0 text-red-400" />
-//                     <span>Log Out</span>
-//                   </button>
-//                 </div>
-//               )}
-//             </div>
-//           )}
-
-//         </div>
-//       </div>
-//     </nav>
-//   );
-// }
-
-
-
-
 "use client";
 
 import { authClient } from "@/lib/auth-client";
 import { Avatar, Button, Dropdown, Label } from "@heroui/react";
-import Image from "next/image";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import React, { useState } from "react";
 import { BiLogOut } from "react-icons/bi";
 import { CgProfile } from "react-icons/cg";
 import { MdDashboard } from "react-icons/md";
+import NavLink from "./NavLink";
+import { usePathname } from "next/navigation";
+import { Heart } from "lucide-react";
+import ThemeSwitch from "./ThemeSwitch";
+
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -338,12 +28,17 @@ const Navbar = () => {
   };
 
   return (
-    <div>
-      <nav className="sticky top-0 z-40 w-full border-b border-separator bg-background/70 backdrop-blur-lg">
-        <header className="mx-auto flex h-16 max-w-7xl items-center justify-between px-2">
-          <div className="flex items-center gap-4">
+    // ন্যাভবারটি ফিক্সড করার পর পেজের অন্যান্য কন্টেন্ট যাতে উপরে চেপে না যায়, 
+    // সেজন্য পেরেন্ট ডিভে h-16 নিশ্চিত করা হয়েছে।
+    <div className="w-full h-16 relative">
+      {/* fixed top-0 left-0 এবং w-full ব্যবহারের মাধ্যমে এটিকে স্ক্রিনের সাথে পার্মানেন্টলি আটকে দেওয়া হয়েছে */}
+      <nav className="fixed top-0 left-0 z-50 w-full border-b border-separator bg-background/80 backdrop-blur-lg shadow-sm">
+        <header className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
+          
+          {/* লোগো এবং মোবাইল হ্যামবার্গার মেনু */}
+          <div className="flex items-center gap-4 md:flex-1">
             <button
-              className="md:hidden"
+              className="md:hidden text-slate-700"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label="Toggle menu"
               aria-expanded={isMenuOpen}
@@ -372,150 +67,145 @@ const Navbar = () => {
                 )}
               </svg>
             </button>
-            <Link href={'/'}>
-              <div className="flex items-center gap-3">
-                <Image
-                  height={40}
-                  width={40}
-                  loading="eager"
-                  src="/logo.webp"
-                  alt="logo"
-                />
-                <p className="font-bold">Tech Bazaar</p>
+            
+            <div className="flex items-center gap-2 cursor-pointer">
+              <div className="bg-red-600 text-white p-2 rounded-full shadow-md shadow-red-200">
+                <Heart className="w-5 h-5 fill-current" />
               </div>
-            </Link>
+              <span className="text-xl font-bold text-slate-900 tracking-tight">
+                Bhado<span className="text-red-600">N.</span>
+              </span>
+            </div>
           </div>
 
-          {/* Desktop Navigation Links */}
-          <ul className="hidden items-center gap-4 md:flex">
-            <li>
-              <Link
-                href="/products"
-                className="font-medium text-accent"
-                aria-current="page"
-              >
-                Browse Products
-              </Link>
-            </li>
-            <li>
-              <Link href="/search">Search</Link>
-            </li>
-            {/* ইউজার লগইন থাকলে ডেস্কটপে এই Donation লিঙ্কটি দেখাবে */}
-            {user && (
+          {/* ডেক্সটপ নেভিগেশন লিংকসমূহ */}
+          <div className="hidden md:flex justify-center md:flex-1">
+            <ul className="flex items-center gap-4">
               <li>
-                <Link href="/donation">Donation</Link>
-              </li>
-            )}
-          </ul>
-
-          {!user && (
-            <div className="hidden items-center gap-4 md:flex">
-              <Link href="/login">Login</Link>
-              <Link href="/register">
-                <Button>Sign Up</Button>
-              </Link>
-            </div>
-          )}
-
-          {user && (
-            <div className="hidden items-center gap-4 md:flex">
-              <Dropdown>
-                <Dropdown.Trigger className="rounded-full">
-                  <Avatar size="sm" aria-label="Menu">
-                    <Avatar.Image
-                      referrerPolicy="no-referrer"
-                      alt="User Avatar"
-                      src={user?.image}
-                    />
-                    <Avatar.Fallback>{user.name?.charAt(0)}</Avatar.Fallback>
-                  </Avatar>
-                </Dropdown.Trigger>
-                <Dropdown.Popover>
-                  <div className="px-3 pt-3 pb-1">
-                    <div className="flex items-center gap-2">
-                      <Avatar size="sm">
-                        <Avatar.Image alt={user?.name} src={user?.image} />
-                        <Avatar.Fallback delayMs={600}>JD</Avatar.Fallback>
-                      </Avatar>
-                      <div className="flex flex-col gap-0">
-                        <p className="text-sm leading-5 font-medium">
-                          {user?.name}
-                        </p>
-                        <p className="text-xs leading-none text-muted">
-                          {user?.email}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <Dropdown.Menu
-                    onAction={(key) => console.log(`Selected: ${key}`)}
-                  >
-                    <Dropdown.Item id="new-file" textValue="New file">
-                      <Link
-                        className="flex items-center gap-2"
-                        href={`/dashboard/${user?.role}`}
-                      >
-                        <MdDashboard />
-                        <Label>Dashboard</Label>
-                      </Link>
-                    </Dropdown.Item>
-
-                    <Dropdown.Item id="copy-link" textValue="Copy link">
-                      <CgProfile />
-                      <Label>Profile</Label>
-                    </Dropdown.Item>
-
-                    <Dropdown.Item
-                      id="delete-file"
-                      textValue="Delete file"
-                      variant="danger"
-                      onClick={handleSignOut}
-                    >
-                      <BiLogOut />
-                      <Label>Logout</Label>
-                    </Dropdown.Item>
-                  </Dropdown.Menu>
-                </Dropdown.Popover>
-              </Dropdown>
-            </div>
-          )}
-        </header>
-
-        {/* Mobile Navigation Menu */}
-        {isMenuOpen && (
-          <div className="border-t border-separator md:hidden">
-            <ul className="flex flex-col gap-2 p-4">
-              <li>
-                <Link href="#" className="block py-2">
-                  Features
-                </Link>
+                <NavLink href="/">Home</NavLink>
               </li>
               <li>
-                <Link href="/dashboard" className="block py-2 font-medium text-accent">
-                  Dashboard
-                </Link>
+                <NavLink href="/search">Search</NavLink>
               </li>
-              <li>
-                <Link href="/pricing" className="block py-2">
-                  Pricing
-                </Link>
-              </li>
-              {/* ইউজার লগইন থাকলে মোবাইলেও Donation লিঙ্কটি দেখাবে */}
               {user && (
                 <li>
-                  <Link href="/donation" className="block py-2">
-                    Donation
-                  </Link>
+                  <NavLink href="/donation">Donation</NavLink>
                 </li>
               )}
-              <li className="mt-4 flex flex-col gap-2 border-t border-separator pt-4">
-                <Link href="/login" className="block py-2">
-                  Login
-                </Link>
-                <Link href="/register" className="block py-2">
-                  Sign Up
-                </Link>
+            </ul>
+          </div>
+
+          {/* ইউজার প্রোফাইল / অথেনটিকেশন বাটনসমূহ */}
+          <div className="flex items-center justify-end gap-4 md:flex-1">
+            {!user && (
+              <div className="hidden items-center gap-4 md:flex">
+               
+                <NavLink href="/login">Login</NavLink>
+                <NavLink href="/register">
+                  <Button className="bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl px-5">
+                    Sign Up
+                  </Button>
+                </NavLink>
+              </div>
+            )}
+
+            {user && (
+              <div className="flex items-center gap-4">
+                <Dropdown placement="bottom-end">
+                  <Dropdown.Trigger className="rounded-full cursor-pointer">
+                    <Avatar size="sm" aria-label="Menu">
+                      <Avatar.Image
+                        referrerPolicy="no-referrer"
+                        alt="User Avatar"
+                        src={user?.image}
+                      />
+                      <Avatar.Fallback>{user.name?.charAt(0)}</Avatar.Fallback>
+                    </Avatar>
+                  </Dropdown.Trigger>
+                  <Dropdown.Popover>
+                    <div className="px-3 pt-3 pb-1">
+                      <div className="flex items-center gap-2">
+                        <Avatar size="sm">
+                          <Avatar.Image alt={user?.name} src={user?.image} />
+                          <Avatar.Fallback delayMs={600}>JD</Avatar.Fallback>
+                        </Avatar>
+                        <div className="flex flex-col gap-0">
+                          <p className="text-sm leading-5 font-medium">
+                            {user?.name}
+                          </p>
+                          <p className="text-xs leading-none text-muted">
+                            {user?.email}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <Dropdown.Menu
+                      onAction={(key) => console.log(`Selected: ${key}`)}
+                    >
+                      <Dropdown.Item id="new-file" textValue="New file">
+                        <NavLink
+                          className="flex items-center gap-2 w-full h-full"
+                          href={`/dashboard/${user?.role}`}
+                        >
+                          <MdDashboard />
+                          <Label>Dashboard</Label>
+                        </NavLink>
+                      </Dropdown.Item>
+
+                      <Dropdown.Item id="copy-link" textValue="Copy link">
+                        <NavLink className="w-full h-full block" href={`dashboard/donor/profile`}>
+                          <CgProfile className="inline mr-2" />
+                          <Label>Profile</Label>
+                        </NavLink>
+                      </Dropdown.Item>
+
+                      <Dropdown.Item
+                        id="delete-file"
+                        textValue="Delete file"
+                        variant="danger"
+                        onClick={handleSignOut}
+                      >
+                        <div className="flex items-center gap-2 text-red-600">
+                          <BiLogOut />
+                          <Label>Logout</Label>
+                        </div>
+                      </Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown.Popover>
+                </Dropdown>
+              </div>
+            )}
+            <ThemeSwitch />
+          </div>
+
+        </header>
+
+        {/* মোবাইল রেসপনসিভ ড্রপডাউন মেনু */}
+        {isMenuOpen && (
+          <div className="border-t border-separator md:hidden bg-background w-full shadow-lg absolute left-0 top-16">
+            <ul className="flex flex-col gap-2 p-4">
+              <li>
+                <NavLink href="/" className="block py-2">Home</NavLink>
               </li>
+              <li>
+                <NavLink href="/search" className="block py-2">Search</NavLink>
+              </li>
+              {user && (
+                <>
+                  <li>
+                    <NavLink href="/donation" className="block py-2">Donation</NavLink>
+                  </li>
+                  <li>
+                    <NavLink href="/dashboard" className="block py-2">Dashboard</NavLink>
+                  </li>
+                </>
+              )}
+              {!user && (
+                <li className="mt-4 flex flex-col gap-2 border-t border-separator pt-4">
+                  <NavLink href="/login" className="block py-2">Login</NavLink>
+                  <NavLink href="/register" className="block py-2">Sign Up</NavLink>
+                </li>
+              )}
             </ul>
           </div>
         )}
