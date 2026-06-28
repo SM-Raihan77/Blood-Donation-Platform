@@ -1,24 +1,22 @@
 'use client';
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaUsers, FaHandHoldingHeart, FaHeartbeat } from 'react-icons/fa';
-// আপনার প্রজেক্টের AuthContext-এর পাথ দিন
 import { authClient } from '@/lib/auth-client'; 
 
-const DashboardHome =  () => {
-  // সেশন থেকে ইউজার ডাটা নেওয়া
+const DashboardHome = () => {
+  // Fetch user data from session
   const { data: session } = authClient.useSession();
-   const user = session?.user;
+  const user = session?.user;
  
-   const adminUser = user?.name
-     ? user
-     : { name: "Donor User", email: "donor@example.com" };  
+  const adminUser = user?.name
+    ? user
+    : { name: "Donor User", email: "donor@example.com" };  
 
   const [stats, setStats] = useState({
     totalDonors: 0,
     totalFunding: 0,
     totalRequests: 0,
   });
-
   
   const [loading, setLoading] = useState(true);
 
@@ -27,17 +25,16 @@ const DashboardHome =  () => {
       try {
         setLoading(true);
         
-        
         const response = await fetch('http://localhost:5000/api/dashboard-stats');
         
-        // fetch-এ ডাটাকে ম্যানুয়ালি .json() দিয়ে কনভার্ট করতে হয়
+        // Convert response data to JSON
         const result = await response.json(); 
         
         if (result.success) {
           setStats(result.data);
         }
       } catch (error) {
-        console.error("ডাটা লোড করতে সমস্যা হয়েছে:", error);
+        console.error("Error loading dashboard statistics:", error);
       } finally {
         setLoading(false);
       }
@@ -53,10 +50,10 @@ const DashboardHome =  () => {
       {/* Welcome Section */}
       <div className="bg-gradient-to-r from-red-500 to-red-600 rounded-2xl p-6 md:p-8 text-white shadow-md mb-8">
         <h1 className="text-2xl md:text-4xl font-bold mb-2">
-          স্বাগতম, {adminUser.name}! 👋
+          Welcome back, {adminUser.name}! 
         </h1>
         <p className="text-red-100 text-sm md:text-base max-w-xl">
-          আপনার ড্যাশবোর্ডে স্বাগতম। এখান থেকে আপনি প্ল্যাটফর্মের কার্যক্রম এবং রক্তের জরুরি রিকোয়েস্টগুলো মনিটর করতে পারবেন।
+          Welcome to your dashboard. From here, you can easily monitor platform activities, track total configurations, and manage urgent blood donation requests.
         </p>
       </div>
 
@@ -73,7 +70,7 @@ const DashboardHome =  () => {
               <h3 className="text-3xl font-bold text-gray-800 mt-2">{stats.totalDonors.toLocaleString()}</h3>
             )}
           </div>
-          <div className="p-4 bg-blue-50 rounded-lg text-blue-500"><FaUsers size={28} /></div>
+          <div className="p-4 bg-red-50 rounded-lg text-red-600"><FaUsers size={28} /></div>
         </div>
 
         {/* Card 2: Total Funding */}
@@ -86,7 +83,7 @@ const DashboardHome =  () => {
               <h3 className="text-3xl font-bold text-gray-800 mt-2">৳{stats.totalFunding.toLocaleString()}</h3>
             )}
           </div>
-          <div className="p-4 bg-green-50 rounded-lg text-green-500"><FaHandHoldingHeart size={28} /></div>
+          <div className="p-4 bg-red-50 rounded-lg text-red-600"><FaHandHoldingHeart size={28} /></div>
         </div>
 
         {/* Card 3: Total Requests */}
@@ -99,7 +96,7 @@ const DashboardHome =  () => {
               <h3 className="text-3xl font-bold text-gray-800 mt-2">{stats.totalRequests.toLocaleString()}</h3>
             )}
           </div>
-          <div className="p-4 bg-red-50 rounded-lg text-red-500"><FaHeartbeat size={28} /></div>
+          <div className="p-4 bg-red-50 rounded-lg text-red-600"><FaHeartbeat size={28} /></div>
         </div>
 
       </div>
