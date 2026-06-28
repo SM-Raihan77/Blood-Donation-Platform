@@ -1,2 +1,18 @@
 @import "tailwindcss";
 @import "@heroui/styles"; 
+
+
+@keyframes marquee {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+.animate-marquee {
+  display: inline-block;
+  animation: marquee 25s linear infinite;
+}
+
+/* মাউস রাখলে স্ক্রলিং থামানোর জন্য (ঐচ্ছিক) */
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
