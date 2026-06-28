@@ -1,23 +1,41 @@
 "use client";
 
+
 import React, { useEffect, useState } from "react";
+import { authClient } from "@/lib/auth-client";
+import Link from "next/link";
 
 export default function AllDonationRequestsPage() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+
+  const { data: session, isPending } = authClient.useSession();
 
   useEffect(() => {
     const fetchDonationRequests = async () => {
-      try {
-        setLoading(true);
-        setError("");
+      if (isPending) return;
 
-        const res = await fetch("http://localhost:5000/api/donation-requests", {
-          method: "GET",
-          credentials: "include",
-          cache: "no-store",
-        });
+      if (!session?.user?.email) {
+        setLoading(false);
+        return;
+      }
+      // console.log("Email:", session?.user?.email);
+      // console.log("Page:", page);
+      try {
+        const res = await fetch(
+          `http://localhost:5000/api/my-donation-requests?email=${encodeURIComponent(
+            session.user.email
+          )}&page=${page}&limit=6`,
+          {
+            method: "GET",
+            credentials: "include",
+            cache: "no-store",
+          }
+        );
 
         const data = await res.json();
 
@@ -26,6 +44,7 @@ export default function AllDonationRequestsPage() {
         }
 
         setRequests(data?.data || []);
+        setTotalPages(data?.totalPages || 1);
       } catch (err) {
         console.error("Fetch donation requests error:", err);
         setError(err.message || "Something went wrong");
@@ -35,7 +54,7 @@ export default function AllDonationRequestsPage() {
     };
 
     fetchDonationRequests();
-  }, []);
+  }, [session, isPending, page]);
 
   if (loading) {
     return (
@@ -75,10 +94,10 @@ export default function AllDonationRequestsPage() {
       <div className="max-w-7xl mx-auto">
         {/* header */}
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-red-600">
+          <h1 className="text-3xl md:text-4xl font-bold text-red-600 mx-auto max-w-2xl text-center">
             All Donation Requests
           </h1>
-          <p className="text-gray-600 mt-2">
+          <p className="text-gray-600 mt-2 mx-auto max-w-2xl text-center">
             Browse all blood donation requests posted by users.
           </p>
         </div>
@@ -90,6 +109,7 @@ export default function AllDonationRequestsPage() {
               key={request._id}
               className="bg-white rounded-2xl border border-gray-100 shadow-md p-5 hover:shadow-lg transition"
             >
+
               {/* top row */}
               <div className="flex items-start justify-between gap-3 mb-4">
                 <div>
@@ -102,15 +122,14 @@ export default function AllDonationRequestsPage() {
                 </div>
 
                 <span
-                  className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                    request.status === "pending"
-                      ? "bg-yellow-100 text-yellow-700"
-                      : request.status === "inprogress"
+                  className={`px-3 py-1 rounded-full text-xs font-semibold ${request.status === "pending"
+                    ? "bg-yellow-100 text-yellow-700"
+                    : request.status === "inprogress"
                       ? "bg-blue-100 text-blue-700"
                       : request.status === "done"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-red-100 text-red-700"
-                  }`}
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
                 >
                   {request.status}
                 </span>
@@ -174,14 +193,51 @@ export default function AllDonationRequestsPage() {
                     : "N/A"}
                 </span>
 
-                <button className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition">
+                <Link
+                  href={`/donation-requests/${request._id}`}
+                  className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition"
+                >
                   View Details
-                </button>
+                </Link>
               </div>
+
             </div>
+
+
           ))}
+        </div>
+        <div className="flex justify-center items-center gap-2 mt-8">
+          <button
+            onClick={() => setPage(page - 1)}
+            disabled={page === 1}
+            className="px-4 py-2 rounded-lg border disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Previous
+          </button>
+
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index}
+              onClick={() => setPage(index + 1)}
+              className={`px-4 py-2 rounded-lg ${page === index + 1
+                ? "bg-red-600 text-white"
+                : "border hover:bg-gray-100"
+                }`}
+            >
+              {index + 1}
+            </button>
+          ))}
+
+          <button
+            onClick={() => setPage(page + 1)}
+            disabled={page === totalPages}
+            className="px-4 py-2 rounded-lg border disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Next
+          </button>
         </div>
       </div>
     </div>
+
   );
 }

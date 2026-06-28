@@ -121,15 +121,14 @@ export default function DonationRequestDetailsPage() {
             </div>
 
             <span
-              className={`capitalize inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold w-fit ${
-                request.status === "done"
+              className={`capitalize inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold w-fit ${request.status === "done"
                   ? "bg-green-100 text-green-700"
                   : request.status === "canceled"
-                  ? "bg-gray-200 text-gray-700"
-                  : request.status === "inprogress"
-                  ? "bg-blue-100 text-blue-700"
-                  : "bg-yellow-100 text-yellow-700"
-              }`}
+                    ? "bg-gray-200 text-gray-700"
+                    : request.status === "inprogress"
+                      ? "bg-blue-100 text-blue-700"
+                      : "bg-yellow-100 text-yellow-700"
+                }`}
             >
               {request.status}
             </span>
