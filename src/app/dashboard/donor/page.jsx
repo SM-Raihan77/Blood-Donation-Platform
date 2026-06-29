@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -18,8 +16,6 @@ export default function DashboardHome() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  
- 
 
   // ==========================
   // FETCH RECENT 3 REQUESTS
@@ -30,7 +26,6 @@ export default function DashboardHome() {
         if (!user?.email) return;
 
         setLoading(true);
-        
 
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_SERVER_URL}/api/donation-requests?status=pending&page=${page}&limit=3`,
@@ -42,8 +37,7 @@ export default function DashboardHome() {
         );
 
         const data = await res.json();
-      
-console.log("API Response:", data);
+        console.log("API Response:", data);
 
         if (!res.ok) {
           throw new Error(data?.message || "Failed to fetch requests");
@@ -59,14 +53,13 @@ console.log("API Response:", data);
     };
 
     fetchRequests();
-  }, [user?.email]);
+  }, [user?.email, page]);
 
   // ==========================
   // STATUS UPDATE HANDLER
   // ==========================
   const handleStatusChange = async (id, newStatus) => {
     try {
-      
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/api/donation-requests/${id}/status`,
         {
@@ -136,41 +129,197 @@ console.log("API Response:", data);
 
   if (isPending || loading) {
     return (
-      <div className="p-6 max-w-7xl mx-auto min-h-screen bg-gray-50 text-gray-800 flex items-center justify-center">
+      <div className="p-4 md:p-6 max-w-7xl mx-auto min-h-screen bg-gray-50 text-gray-800 flex items-center justify-center">
         <p className="text-lg font-medium text-gray-600">Loading dashboard...</p>
       </div>
     );
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto min-h-screen bg-gray-50 text-gray-800">
+    <div className="p-4 md:p-6 max-w-7xl mx-auto min-h-screen bg-gray-50 text-gray-800">
       {/* --- WELCOME SECTION --- */}
-      <div className="bg-red-50 border border-red-200 p-6 rounded-xl mb-8 shadow-sm">
-        <h1 className="text-2xl md:text-3xl font-bold text-red-600">
-          Welcome, {donorUser.name}! 
+      <div className="bg-red-50 border border-red-200 p-4 md:p-6 rounded-xl mb-6 md:mb-8 shadow-sm">
+        <h1 className="text-xl md:text-3xl font-bold text-red-600">
+          Welcome, {donorUser.name}!
         </h1>
-        <p className="text-gray-600 mt-1">
+        <p className="text-sm md:text-base text-gray-600 mt-1">
           Manage your blood donation requests from here.
         </p>
       </div>
 
       {/* --- RECENT REQUESTS SECTION --- */}
       {requests.length > 0 && (
-        <div className="bg-white shadow-md rounded-xl p-6 border border-gray-100">
-          <div className="flex items-center justify-between mb-4 border-b pb-3">
-            <h2 className="text-xl font-semibold text-gray-700">
+        <div className="bg-white shadow-md rounded-xl p-4 md:p-6 border border-gray-100">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 border-b pb-4">
+            <h2 className="text-lg md:text-xl font-semibold text-gray-700">
               Your Recent Donation Requests (Latest: 3)
             </h2>
 
             <Link
               href="/dashboard/donor/my-donation-requests"
-              className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition"
+              className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition text-center sm:w-auto w-full"
             >
               View My All Requests
             </Link>
           </div>
 
-          <div className="overflow-x-auto">
+          {/* --- MOBILE VIEW: CARD LAYOUT (hidden on md and larger) --- */}
+          <div className="block md:hidden space-y-4">
+            {requests.map((request) => (
+              <div
+                key={request._id}
+                className="p-4 border border-gray-200 rounded-xl bg-gray-50 space-y-3 relative"
+              >
+                {/* Blood Group Badge Top Right */}
+                <span className="absolute top-4 right-12 bg-red-100 text-red-700 font-bold px-2.5 py-1 rounded-md text-xs">
+                  {request.bloodGroup}
+                </span>
+
+                {/* Actions Button for Mobile */}
+                <div className="absolute top-2 right-2">
+                  <button
+                    onClick={() =>
+                      setActiveDropdown(
+                        activeDropdown === request._id ? null : request._id
+                      )
+                    }
+                    className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-full transition focus:outline-none"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path d="M6 10a2 2 0 110-4 2 2 0 010 4zm4 0a2 2 0 110-4 2 2 0 010 4zm4 0a2 2 0 110-4 2 2 0 010 4z" />
+                    </svg>
+                  </button>
+
+                  {/* Dropdown Menu for Mobile */}
+                  {activeDropdown === request._id && (
+                    <div className="absolute right-0 top-10 z-20 mt-1 w-48 rounded-xl border border-gray-200 bg-white shadow-lg text-left overflow-hidden">
+                      <Link
+                        href={`/dashboard/donor/donation-requests/${request._id}`}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        onClick={() => setActiveDropdown(null)}
+                      >
+                        View request
+                      </Link>
+                      <Link
+                        href={`/dashboard/donor/edit-donation-request/${request._id}`}
+                        className="block px-4 py-2 text-sm text-blue-700 hover:bg-gray-50"
+                        onClick={() => setActiveDropdown(null)}
+                      >
+                        Edit request
+                      </Link>
+                      {request.status === "inprogress" && (
+                        <>
+                          <button
+                            onClick={() => {
+                              handleStatusChange(request._id, "done");
+                              setActiveDropdown(null);
+                            }}
+                            className="w-full text-left px-4 py-2 text-sm text-green-700 hover:bg-gray-50"
+                          >
+                            Mark as done
+                          </button>
+                          <button
+                            onClick={() => {
+                              handleStatusChange(request._id, "canceled");
+                              setActiveDropdown(null);
+                            }}
+                            className="w-full text-left px-4 py-2 text-sm text-orange-600 hover:bg-gray-50"
+                          >
+                            Cancel request
+                          </button>
+                        </>
+                      )}
+                      <button
+                        onClick={() => {
+                          handleDelete(request._id);
+                          setActiveDropdown(null);
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50"
+                      >
+                        Delete request
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <span className="text-xs font-semibold uppercase text-gray-400 block">
+                    Recipient Name
+                  </span>
+                  <p className="font-semibold text-gray-900">
+                    {request.recipientName}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <span className="text-xs font-semibold uppercase text-gray-400 block">
+                      Location
+                    </span>
+                    <p className="text-sm text-gray-700">
+                      {request.upazila}, {request.district}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-xs font-semibold uppercase text-gray-400 block">
+                      Date & Time
+                    </span>
+                    <p className="text-sm text-gray-700">
+                      {request.donationDate} <br />
+                      <span className="text-xs text-gray-400">
+                        {request.donationTime}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-gray-200">
+                  <div>
+                    <span className="text-xs font-semibold uppercase text-gray-400 block">
+                      Status
+                    </span>
+                    <span
+                      className={`inline-block capitalize px-2.5 py-0.5 rounded-full font-medium text-xs mt-1 ${
+                        request.status === "done"
+                          ? "bg-green-100 text-green-800"
+                          : request.status === "canceled"
+                          ? "bg-gray-100 text-gray-600"
+                          : request.status === "inprogress"
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-yellow-100 text-yellow-800"
+                      }`}
+                    >
+                      {request.status}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-xs font-semibold uppercase text-gray-400 block">
+                      Donor Info
+                    </span>
+                    {request.status === "inprogress" ? (
+                      <div className="mt-1">
+                        <p className="font-semibold text-xs text-gray-700">
+                          {request.donorName || "Donor assigned"}
+                        </p>
+                        <p className="text-gray-500 text-[10px]">
+                          {request.donorEmail || "No email"}
+                        </p>
+                      </div>
+                    ) : (
+                      <span className="text-gray-400 text-sm">—</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* --- DESKTOP VIEW: TABLE LAYOUT (hidden on small screens) --- */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider border-b">
@@ -186,33 +335,31 @@ console.log("API Response:", data);
 
               <tbody className="divide-y divide-gray-100">
                 {requests.map((request) => (
-                  <tr key={request._id} className="hover:bg-gray-50 transition-colors">
-                    {/* Recipient Name */}
+                  <tr
+                    key={request._id}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
                     <td className="p-4 font-medium text-gray-900">
                       {request.recipientName}
                     </td>
 
-                    {/* Location */}
                     <td className="p-4 text-sm text-gray-600">
                       {request.upazila}, {request.district}
                     </td>
 
-                    {/* Date & Time */}
                     <td className="p-4 text-sm text-gray-600">
-                      <div>{request.donationDate}</div>
+                      {request.donationDate}
                       <div className="text-xs text-gray-400">
                         {request.donationTime}
                       </div>
                     </td>
 
-                    {/* Blood Group */}
                     <td className="p-4 text-center">
                       <span className="bg-red-100 text-red-700 font-bold px-2.5 py-1 rounded-md text-sm">
                         {request.bloodGroup}
                       </span>
                     </td>
 
-                    {/* Status */}
                     <td className="p-4">
                       <span
                         className={`capitalize px-2.5 py-1 rounded-full font-medium text-xs ${
@@ -229,7 +376,6 @@ console.log("API Response:", data);
                       </span>
                     </td>
 
-                    {/* Donor Info */}
                     <td className="p-4 text-sm">
                       {request.status === "inprogress" ? (
                         <div>
@@ -245,7 +391,6 @@ console.log("API Response:", data);
                       )}
                     </td>
 
-                    {/* Actions */}
                     <td className="p-4 text-center relative">
                       <button
                         onClick={() =>
@@ -268,16 +413,14 @@ console.log("API Response:", data);
 
                       {activeDropdown === request._id && (
                         <div className="absolute right-4 top-12 z-10 mt-2 w-52 rounded-xl border border-gray-200 bg-white shadow-lg text-left overflow-hidden">
-                          {/* View */}
                           <Link
-                          href={`/dashboard/donor/donation-requests/${request._id}`}
+                            href={`/dashboard/donor/donation-requests/${request._id}`}
                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                             onClick={() => setActiveDropdown(null)}
                           >
                             View request
                           </Link>
 
-                          {/* Edit */}
                           <Link
                             href={`/dashboard/donor/edit-donation-request/${request._id}`}
                             className="block px-4 py-2 text-sm text-blue-700 hover:bg-gray-50"
@@ -286,7 +429,6 @@ console.log("API Response:", data);
                             Edit request
                           </Link>
 
-                          {/* Done / Cancel শুধু inprogress হলে */}
                           {request.status === "inprogress" && (
                             <>
                               <button
@@ -311,7 +453,6 @@ console.log("API Response:", data);
                             </>
                           )}
 
-                          {/* Delete */}
                           <button
                             onClick={() => {
                               handleDelete(request._id);
@@ -332,7 +473,7 @@ console.log("API Response:", data);
         </div>
       )}
 
-      {/* যদি কোনো request না থাকে, পুরো section hide না করে optional message দিতে চাইলে এটা রাখো */}
+      {/* Empty State */}
       {requests.length === 0 && (
         <div className="bg-white shadow-md rounded-xl p-6 border border-gray-100 text-center">
           <p className="text-gray-500">
